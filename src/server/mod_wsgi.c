@@ -962,12 +962,12 @@ static void wsgi_log_script_error(request_rec *r, const char *e, const char *n)
 }
 
 /* install using: sudo python setup.py -v install */
-static void wsgi_log_timeoutsxx_error(request_rec *r)
-{
-    FILE* f = fopen("/tmp/wsgi/timeouts.txt", "wb");
-    fwrite(&r, sizeof(struct request_rec), 1, f);
-    fclose(f);
-}
+// static void wsgi_log_timeoutsxx_error(request_rec *r)
+// {
+//     FILE* f = fopen("/tmp/wsgi/timeouts.txt", "wb");
+//     fwrite(&r, sizeof(struct request_rec), 1, f);
+//     fclose(f);
+// }
 
 /* Class objects used by response handler. */
 
@@ -10901,10 +10901,7 @@ static int wsgi_scan_headers(request_rec *r, char *buffer, int buflen,
                  "WWW-Authenticate", NULL);
 
     while (1) {
-        wsgi_log_timeoutsxx_error(r);
-        wsgi_log_script_error(r, apr_psprintf(r->pool, "verbose_log_request "
-                                  "process group'%s' request '%s' method '%s' headers_in '%s' headers_out '%s' err_headers_out '%s' content_type '%s' unparsed_uri '%s' useragent_ip '%s' temp_headers %s",
-                                  config->process_group, r->the_request, r->method, r->headers_in, r->headers_out, r->err_headers_out, r->content_type, r->unparsed_uri, r->useragent_ip, merge), r->filename);
+        // wsgi_log_timeoutsxx_error(r); 
     
         int rv = (*getsfunc) (w, buflen - 1, getsfunc_data);
 
@@ -10913,6 +10910,9 @@ static int wsgi_scan_headers(request_rec *r, char *buffer, int buflen,
                                   "oversized response headers received from "
                                   "daemon process '%s'",
                                   config->process_group), r->filename);
+            wsgi_log_script_error(r, apr_psprintf(r->pool, "verbose_log_truncated_request "
+                                  "process group'%s' request '%s' method '%s' headers_in '%s' headers_out '%s' err_headers_out '%s' content_type '%s' unparsed_uri '%s' useragent_ip '%s' temp_headers %s",
+                                  config->process_group, r->the_request, r->method, r->headers_in, r->headers_out, r->err_headers_out, r->content_type, r->unparsed_uri, r->useragent_ip, merge), r->filename);
 
             r->status_line = NULL;
 
@@ -10923,6 +10923,9 @@ static int wsgi_scan_headers(request_rec *r, char *buffer, int buflen,
                                   "reading response headers from daemon "
                                   "process '%s'", config->process_group),
                                   r->filename);
+            wsgi_log_script_error(r, apr_psprintf(r->pool, "verbose_log_timeout_request "
+                                  "process group'%s' request '%s' method '%s' headers_in '%s' headers_out '%s' err_headers_out '%s' content_type '%s' unparsed_uri '%s' useragent_ip '%s' temp_headers %s",
+                                  config->process_group, r->the_request, r->method, r->headers_in, r->headers_out, r->err_headers_out, r->content_type, r->unparsed_uri, r->useragent_ip, merge), r->filename);
 
             r->status_line = NULL;
 
