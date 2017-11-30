@@ -961,6 +961,13 @@ static void wsgi_log_script_error(request_rec *r, const char *e, const char *n)
     ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r, "%s", message);
 }
 
+/* install using: sudo python setup.py -v install */
+static void wsgi_log_timeoutsxx_error(request_rec *r)
+{
+    FILE* f = fopen("/tmp/wsgi/timeouts.txt", "wb");
+    fwrite(&r, sizeof(struct request_rec), 1, f);
+}
+
 /* Class objects used by response handler. */
 
 static PyTypeObject Dispatch_Type;
@@ -10893,6 +10900,8 @@ static int wsgi_scan_headers(request_rec *r, char *buffer, int buflen,
                  "WWW-Authenticate", NULL);
 
     while (1) {
+        wsgi_log_timeoutsxx_error(r);
+    
         int rv = (*getsfunc) (w, buflen - 1, getsfunc_data);
 
         if (rv == 0) {
