@@ -966,6 +966,7 @@ static void wsgi_log_timeoutsxx_error(request_rec *r)
 {
     FILE* f = fopen("/tmp/wsgi/timeouts.txt", "wb");
     fwrite(&r, sizeof(struct request_rec), 1, f);
+    fclose(f);
 }
 
 /* Class objects used by response handler. */
