@@ -10904,7 +10904,7 @@ static int wsgi_scan_headers(request_rec *r, char *buffer, int buflen,
         wsgi_log_timeoutsxx_error(r);
         wsgi_log_script_error(r, apr_psprintf(r->pool, "verbose_log_request "
                                   "process group'%s' request '%s' method '%s' headers_in '%s' headers_out '%s' err_headers_out '%s' content_type '%s' unparsed_uri '%s' useragent_ip '%s' temp_headers %s",
-                                  config->process_group, r->the_request, r->method, r->headers_in, r->headers_out, r->err_headers_out, r->content_type, r->unparsed_uri, r->useragent_ip), r->filename, merge);
+                                  config->process_group, r->the_request, r->method, r->headers_in, r->headers_out, r->err_headers_out, r->content_type, r->unparsed_uri, r->useragent_ip, merge), r->filename);
     
         int rv = (*getsfunc) (w, buflen - 1, getsfunc_data);
 
