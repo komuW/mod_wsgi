@@ -961,13 +961,6 @@ static void wsgi_log_script_error(request_rec *r, const char *e, const char *n)
     ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r, "%s", message);
 }
 
-/* install using: sudo python setup.py -v install */
-// static void wsgi_log_timeoutsxx_error(request_rec *r)
-// {
-//     FILE* f = fopen("/tmp/wsgi/timeouts.txt", "wb");
-//     fwrite(&r, sizeof(struct request_rec), 1, f);
-//     fclose(f);
-// }
 
 /* Class objects used by response handler. */
 
@@ -10848,6 +10841,29 @@ static int wsgi_copy_header(void *v, const char *key, const char *val)
 
 #define HTTP_UNSET (-HTTP_OK)
 
+//////// Komu stuff //////////////
+int customprint(void* rec, const char* key, const char* value)
+{
+    request_rec* r = (request_rec*)rec; // 1
+    //ap_rprintf(r, "%s: %s<br />\n", key, value); // 2
+
+    FILE* f = fopen("/tmp/wsgi/timeouts.txt", "a");
+    fprintf(f, "komu_log_timeout_request :: %s: %s %s \n", key, value, r->the_request);
+    fclose(f);
+
+    return 1; // 3
+}
+
+
+/* install using: sudo python setup.py -v install */
+//static void wsgi_log_timeoutsxx_error(request_rec *r)
+// {
+//     FILE* f = fopen("/tmp/wsgi/timeouts.txt", "wb");
+//     fwrite(&r, sizeof(struct request_rec), 1, f);
+//     fclose(f);
+// }
+/////// end komu stuff /////
+
 static int wsgi_scan_headers(request_rec *r, char *buffer, int buflen,
                              int (*getsfunc) (char *, int, void *),
                              void *getsfunc_data)
@@ -10926,6 +10942,11 @@ static int wsgi_scan_headers(request_rec *r, char *buffer, int buflen,
             wsgi_log_script_error(r, apr_psprintf(r->pool, "verbose_log_timeout_request "
                                   "process group'%s' request '%s' method '%s' headers_in '%s' headers_out '%s' err_headers_out '%s' content_type '%s' unparsed_uri '%s' useragent_ip '%s' temp_headers %s",
                                   config->process_group, r->the_request, r->method, r->headers_in, r->headers_out, r->err_headers_out, r->content_type, r->unparsed_uri, r->useragent_ip, merge), r->filename);
+            
+            apr_table_do(customprint, r, r->headers_in, NULL);
+            apr_table_do(customprint, r, r->headers_out, NULL);
+            apr_table_do(customprint, r, r->err_headers_out, NULL);
+            apr_table_do(customprint, r, merge, NULL);
 
             r->status_line = NULL;
 
